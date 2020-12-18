@@ -3,6 +3,7 @@ Repositório para o trabalho da matéria TT304A - Sistemas Operacionas - FT Unic
 
 ## Integrantes 
 Laura Nunes Fochi / RA: 256469 / Email: l256469@dac.unicamp.br
+
 Myrelle Silva Lopes  /  RA: 242265 / Email: smyrellelopes@gmail.com
 
 # Grupo
