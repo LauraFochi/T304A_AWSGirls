@@ -2,14 +2,13 @@
 Trabalho final da disciplina de Sistemas Operacionais
 Tarefa 2
 Grupo AWS Girls
-Laura Nunes Fochi / RA: 256469 / Email: l256469@dac.unicamp.br
-Myrelle Silva Lopes / RA: 242265 / Email: smyrellelopes@gmail.com
+Laura Nunes Fochi e Myrelle Silva Lopes
 
 Para compilar o programa utilize:
-$ gcc -o tarefa2 tarefa2.c -lpthread
+gcc -o tarefa2 tarefa2.c -lpthread
 
 Para executar o programa utilize:
-$ ./tarefa2
+./tarefa2
 */
 
 #include <stdlib.h>
@@ -22,6 +21,7 @@ $ ./tarefa2
 int contPostIt = 0; //adiciona/conta quantidade post it na mochila
 sem_t acordar; //controla saída do pombo
 sem_t mutex; //controla acesso a mochila do pombo
+sem_t esperar_colar; //controla a variavel que define a mensagem que sera colada na mochila
 
 void dorme_aleatorio();
 void leva_mochila_ate_B_e_volta();
@@ -34,9 +34,10 @@ void *usuario(void *);
 void *pombo(void *);
 
 int VEZES;
-int val=0;
+int valElaboradas=0;
 int buffer[N]; //buffer para salvar as mensagens da mochila
 int proxPosicaoVazia = 0;
+int i = 0;
 
 int main(void)
 {
@@ -50,9 +51,10 @@ int main(void)
 	//iniciando os semaforos
     sem_init(&mutex, 0 , 1);
     sem_init(&acordar, 0, 0);
+    sem_init(&esperar_colar, 0, 1);
 
     pthread_t thdPmb, thdUsu[VEZES];
-	for (int i=0; i<VEZES; i++) //instanciando a thread usuario pelo numero de vezes definido pelo usuario
+	for (i=0; i<VEZES; i++) //instanciando a thread usuario pelo numero de vezes definido pelo usuario
 	{
 		pthread_create(&thdUsu[i], 0, (void *) usuario, NULL);
 	}
@@ -62,7 +64,7 @@ int main(void)
     * thdUsu e thdPmb terminem.
     */
     pthread_join(thdPmb,0);
-	for (int i=0; i<VEZES; i++)
+	for (i=0; i<VEZES; i++)
 	{
 		pthread_join(thdUsu[i],0);
 	}
@@ -104,17 +106,17 @@ void *pombo(void *p_arg)
 		sem_wait (&mutex);
 		printf("pombo acorda\n");
 
+        valElaboradas = 0;
 		leva_mochila_ate_B_e_volta();
 		contPostIt = 0;
 
-		sem_post (&mutex);
-
-		for (int i=0; i<N; i++)
+		for (i=0; i<N; i++)
 		{
 			printf("Adic. msg %d\n", buffer[i]);
 		}
 
         printf("volta para A \n");
+        sem_post (&mutex);
 	}
 	pthread_exit(NULL);
 }
@@ -140,8 +142,10 @@ void ColaPostIt(int mensagem)
 
 int elaboraMensagem() 
 {
-	val++;
-    printf("\nElaborando mensagem: %d \n", val);
-	return val;
+    printf("\nElaborando mensagem:");
+    sem_wait(&esperar_colar); //controla o incremento da variavel valElaboradas para o indice da mensagem colada ser correto
+    valElaboradas++;
+    printf("%d\n", valElaboradas);
+    sem_post(&esperar_colar);
+	return valElaboradas;
 }
-
