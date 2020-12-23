@@ -16,16 +16,3 @@ $ gcc -o tarefa2 tarefa2.c -lpthread
 
 - Para executar o programa utilize:
 $ ./tarefa2
-
-
-- Para acessar a instancia por SSH
-
-Instalar a chave disponível no diretorio Chaves
-
-Abrir o terminal do Windows
-
-Executar o seguinte comando:
-           $ ssh -i caminho_diretorio_chave/chave.pem usuario@3.236.252.189
-
-
-
